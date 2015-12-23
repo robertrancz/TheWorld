@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNet.Authentication.Cookies;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Http;
@@ -9,6 +10,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.PlatformAbstractions;
 using Newtonsoft.Json.Serialization;
+using System.Net;
+using System.Threading.Tasks;
 using TheWorld.Models;
 using TheWorld.Services;
 using TheWorld.ViewModels;
@@ -50,6 +53,20 @@ namespace TheWorld
                 config.User.RequireUniqueEmail = true;
                 config.Password.RequiredLength = 8;
                 config.Cookies.ApplicationCookie.LoginPath = "/Auth/Login";
+                config.Cookies.ApplicationCookie.Events = new CookieAuthenticationEvents()
+                {
+                    OnRedirectToLogin = ctx =>
+                    {
+                        // For the API we don't want a redirect to Login; give an unauthorized status code instead.
+                        if (ctx.Request.Path.StartsWithSegments("/api") && ctx.Response.StatusCode == (int)HttpStatusCode.OK)
+                            ctx.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                        else
+                            // Default behaviour.
+                            ctx.Response.Redirect(ctx.RedirectUri);
+
+                        return Task.FromResult(0);
+                    }
+                };
             })
             .AddEntityFrameworkStores<WorldContext>();
 
