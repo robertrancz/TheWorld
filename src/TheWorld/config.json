@@ -1,0 +1,10 @@
+{
+  "AppSettings": {
+    "SiteEmailAddress": "me@mail.com",
+    "BingKey": "DON'T DO THAT IN SUCH PLACES!"
+
+  },
+  "Data": {
+    "WorldContextConnection": "Server=(localdb)\\MSSQLLocalDB;Database=TheWorldDB;Trusted_Connection=true;MultipleActiveResultSets=true"
+  }	
+}
